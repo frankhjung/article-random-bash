@@ -9,14 +9,36 @@
 # load packages
 require(rmarkdown)
 
-# require a parameter naming file to render
-args = commandArgs(trailingOnly=TRUE)
+# Check if pagedown is available for CSS-based PDFs
+pagedown_available <- requireNamespace("pagedown", quietly = TRUE)
+
+# require parameters: source file and output file
+args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 1) {
-    if (endsWith(args[1], 'html')) {
-        render(gsub('html$', 'Rmd', args[1]), html_document())
-    } else if(endsWith(args[1], 'pdf')) {
-        render(gsub('pdf$', 'Rmd', args[1]), pdf_document())
+  # Legacy mode: infer source from output
+  if (endsWith(args[1], "html")) {
+    render(gsub("html$", "Rmd", args[1]), html_document(css = "article.css"))
+  } else if (endsWith(args[1], "pdf")) {
+    render(gsub("pdf$", "Rmd", args[1]), pdf_document())
+  }
+} else if (length(args) == 2) {
+  # New mode: source file and output file specified
+  source_file <- args[1]
+  output_file <- args[2]
+  if (endsWith(output_file, "html")) {
+    render(source_file, html_document(css = "article.css"), output_file = output_file)
+  } else if (endsWith(output_file, "pdf")) {
+    # Use pagedown for CSS-based PDF if available, otherwise use standard LaTeX
+    if (pagedown_available) {
+      # First render to HTML, then convert to PDF with CSS
+      temp_html <- tempfile(fileext = ".html")
+      render(source_file, html_document(css = "article.css"), output_file = temp_html)
+      pagedown::chrome_print(temp_html, output = output_file)
+      unlink(temp_html)
+    } else {
+      render(source_file, pdf_document(), output_file = output_file)
     }
+  }
 } else {
-    stop("ERROR: too many operands", call. = TRUE)
+  stop("ERROR: wrong number of arguments (expected 1 or 2)", call. = TRUE)
 }

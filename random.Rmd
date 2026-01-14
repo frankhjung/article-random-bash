@@ -1,19 +1,28 @@
 ---
-title: 'Thoughts on RNG - Bash Scripting'
-author: '[frank.jung@marlo.com.au](mailto:frank.jung@marlo.com.au)'
+title: 'Thoughts on Random Number Generation Using Bash Scripts'
+author: 'frankhjung@linux.com'
 date: '`r format(Sys.time(), format="%d %b %Y")`'
 output:
-  html_document: default
-  pdf_document: default
+  html_document:
+    css: article.css
+  pdf_document:
+    latex_engine: pdflatex
+    keep_tex: false
+    number_sections: false
+    fig_caption: true
+    highlight: tango
+    includes:
+      in_header: preamble.tex
 ---
 
 ```{r setup, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-require(randtests)
-require(ggplot2)
-require(lubridate)
+library(randtests)
+library(ggplot2)
+library(lubridate)
 ```
 
+![](images/random-banner.png)
 One of the first exercises given to me as a mathematics student was to write a
 random number generator (RNG). This turned out to be not so easy. Test sequences
 cycled quickly or were too predictable or were not evenly distributed. Typically
@@ -77,13 +86,15 @@ package,
 Annual data on total number of tourists to the United States for 1970-1982.
 
 ```{r example1}
-years <- seq(ymd('1970-01-01'), ymd('1982-01-01'), by = 'years')
-tourists <- c(12362, 12739, 13057, 13955, 14123, 15698, 17523, 18610, 19842,
-20310, 22500, 23080, 21916)
-qplot(years, tourists, colour = I('purple')) +
-   ggtitle('Tourists to United States (1970-1982)') +
-   theme(plot.title = element_text(hjust = 0.5)) +
-   scale_x_date()
+years <- seq(ymd("1970-01-01"), ymd("1982-01-01"), by = "years")
+tourists <- c(
+  12362, 12739, 13057, 13955, 14123, 15698, 17523, 18610, 19842,
+  20310, 22500, 23080, 21916
+)
+qplot(years, tourists, colour = I("purple")) +
+  ggtitle("Tourists to United States (1970-1982)") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_x_date()
 bartels.rank.test(tourists, alternative = "left.sided", pvalue = "beta")
 ```
 
@@ -99,15 +110,19 @@ by the Australian gross domestic product (GDP) price index (base 1966-1967).
 
 ```{r example2}
 gdp <- c(528, 348, 264, -20, -167, 575, 410, -4, 430, -122)
-df <- data.frame(period = paste(sep = '-', 1968:1977, 1969:1978), gdp = gdp, stringsAsFactors = TRUE)
+df <- data.frame(
+  period = paste(sep = "-", 1968:1977, 1969:1978),
+  gdp = gdp,
+  stringsAsFactors = TRUE
+)
 ggplot(data = df, aes(period, gdp)) +
-   geom_point(colour = I('purple')) +
-   ggtitle('Australian Deflated Stock Levels') +
-   theme(plot.title = element_text(hjust = 0.5)) +
-   xlab('Financial Year') +
-   theme(axis.text.x = element_text(angle = 90)) +
-   ylab('GDP (AUD million)')
-bartels.rank.test(gdp, pvalue = 'beta')
+  geom_point(colour = I("purple")) +
+  ggtitle("Australian Deflated Stock Levels") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Financial Year") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  ylab("GDP (AUD million)")
+bartels.rank.test(gdp, pvalue = "beta")
 ```
 
 Here, the sampled data provides weak evidence against the null hypothesis of
@@ -182,31 +197,31 @@ rm $temprandom
 ```
 
 ```{r bashload}
-bashText <- readLines(con <- file(paste0(getwd(), '/bash.random')))
+bash_text <- readLines(con <- file(paste0(getwd(), "/bash.random")))
 close(con)
-bashRandom <- as.numeric(bashText)
+bash_random <- as.numeric(bash_text)
 ```
 
 Show first 10 values:
 
 ```{r bashhead}
-head(bashRandom, n = 10)
+head(bash_random, n = 10)
 ```
 
 Plot the sequence versus value from RNG:
 
 ```{r bashplot}
-bashDF <- data.frame(sequence = seq(length(bashRandom)), RANDOM = bashRandom)
-ggplot(bashDF, aes(x = sequence, y = RANDOM)) +
-   geom_point(size = 0.5, colour = I('purple')) +
-   ggtitle('bash RANDOM') +
-   theme(plot.title = element_text(hjust = 0.5))
+bash_df <- data.frame(sequence = seq_along(bash_random), RANDOM = bash_random)
+ggplot(bash_df, aes(x = sequence, y = RANDOM)) +
+  geom_point(size = 0.5, colour = I("purple")) +
+  ggtitle("bash RANDOM") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 Run Bartels Rank test:
 
 ```{r bashtest}
-bartels.rank.test(bashRandom, 'two.sided', pvalue = 'beta')
+bartels.rank.test(bash_random, "two.sided", pvalue = "beta")
 ```
 
 #### Result
@@ -247,31 +262,31 @@ seq 1000 | awk -e 'BEGIN {srand(314)} {printf("%0.2f\n",rand());}' > awk.random
 ```
 
 ```{r awkload}
-awkText <- readLines(con <- file(paste0(getwd(), '/awk.random')))
+awk_text <- readLines(con <- file(paste0(getwd(), "/awk.random")))
 close(con)
-awkRandom <- as.numeric(awkText)
+awk_random <- as.numeric(awk_text)
 ```
 
 Show first 10 values:
 
 ```{r awkhead}
-head(awkRandom, n = 10)
+head(awk_random, n = 10)
 ```
 
 Plot the sequence vs value from RNG:
 
 ```{r awkplot}
-awkDF <- data.frame(sequence = seq(length(awkRandom)), rand = awkRandom)
-ggplot(awkDF, aes(x = sequence, y = rand)) +
-   geom_point(size = 0.5, colour = I('purple')) +
-   ggtitle('awk rand()') +
-   theme(plot.title = element_text(hjust = 0.5))
+awk_df <- data.frame(sequence = seq_along(awk_random), rand = awk_random)
+ggplot(awk_df, aes(x = sequence, y = rand)) +
+  geom_point(size = 0.5, colour = I("purple")) +
+  ggtitle("awk rand()") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 Run Bartels Rank test:
 
 ```{r awktest}
-bartels.rank.test(awkRandom, 'two.sided', pvalue = 'beta')
+bartels.rank.test(awk_random, "two.sided", pvalue = "beta")
 ```
 
 #### Result
@@ -320,31 +335,31 @@ cat /dev/urandom | tr -dc  '0-9' | fold -w2 | \
 ```
 
 ```{r urandomload}
-urText <- readLines(con <- file(paste0(getwd(), '/urandom.random')))
+ur_text <- readLines(con <- file(paste0(getwd(), "/urandom.random")))
 close(con)
-urRandom <- as.numeric(urText)
+ur_random <- as.numeric(ur_text)
 ```
 
 Show first 10 values:
 
 ```{r urandomhead}
-head(urRandom, n = 10)
+head(ur_random, n = 10)
 ```
 
 Plot the sequence vs value from RNG:
 
 ```{r urandomplot}
-urandomDF <- data.frame(sequence = seq(length(urRandom)), urandom = urRandom)
-ggplot(urandomDF, aes(x = sequence, y = urandom)) +
-   geom_point(size = 0.5, colour = I('purple')) +
-   ggtitle('/dev/urandom') +
-   theme(plot.title = element_text(hjust = 0.5))
+urandom_df <- data.frame(sequence = seq_along(ur_random), urandom = ur_random)
+ggplot(urandom_df, aes(x = sequence, y = urandom)) +
+  geom_point(size = 0.5, colour = I("purple")) +
+  ggtitle("/dev/urandom") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 Run Bartels Rank test:
 
 ```{r urandomtest}
-bartels.rank.test(urRandom, 'two.sided', pvalue = 'beta')
+bartels.rank.test(ur_random, "two.sided", pvalue = "beta")
 ```
 
 #### Result

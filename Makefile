@@ -1,18 +1,23 @@
 #!/usr/bin/make
 
-.PHONY: clean cleanall
+.PHONY: clean cleanall default
 .SUFFIXES: .Rmd .html .pdf
 
 R	= /usr/bin/R
 
-%.html: %.Rmd
-	@$(R) --quiet --slave --vanilla --file=make.R --args $@
+default: public/random.html public/random.pdf
 
-%.pdf:	%.Rmd
-	@$(R) --quiet --slave --vanilla --file=make.R --args $@
+public/%.html: %.Rmd
+	@mkdir -p public
+	@$(R) --quiet --slave --vanilla --file=make.R --args $< $@
+	@mv $@ public/index.html
+
+public/%.pdf:	%.Rmd
+	@mkdir -p public
+	@$(R) --quiet --slave --vanilla --file=make.R --args $< $@
 
 clean:
 	@$(RM) *.random test.* temp.random.* *.zip
 
 cleanall: clean
-	@$(RM) -rf cache figure *.html *.pdf
+	@$(RM) -rf cache figure public/*.html public/*.pdf
