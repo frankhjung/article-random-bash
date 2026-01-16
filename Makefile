@@ -1,6 +1,7 @@
 #!/usr/bin/make
 
 .PHONY: clean cleanall default
+.SUFFIXES:
 .SUFFIXES: .Rmd .html .pdf
 
 R	= /usr/bin/R
