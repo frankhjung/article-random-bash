@@ -1,6 +1,6 @@
 ---
 title: 'Thoughts on Random Number Generation Using Bash Scripts'
-author: 'frankhjung@linux.com'
+author: "[Frank Jung](https://www.linkedin.com/in/frankjung/)"
 date: '`r format(Sys.time(), format="%d %b %Y")`'
 output:
   html_document:
