@@ -1,12 +1,11 @@
+*~
 cache/
-doc/
-*.docx
-figure/
-*.lyx
-notebook.nb.html
+*.constant
+*.log
+*.random
 .RData
 *.rds
 .Rhistory
 .Rproj.user
-*.tex
+*.trend
 *.zip

@@ -26,18 +26,14 @@ if (length(args) == 1) {
   source_file <- args[1]
   output_file <- args[2]
   if (endsWith(output_file, "html")) {
-    render(source_file, html_document(css = "article.css"), output_file = output_file)
+    render(source_file, html_document(css = "article.css", toc = TRUE, toc_depth = 3), output_file = output_file)
   } else if (endsWith(output_file, "pdf")) {
-    # Use pagedown for CSS-based PDF if available, otherwise use standard LaTeX
-    if (pagedown_available) {
-      # First render to HTML, then convert to PDF with CSS
-      temp_html <- tempfile(fileext = ".html")
-      render(source_file, html_document(css = "article.css"), output_file = temp_html)
-      pagedown::chrome_print(temp_html, output = output_file)
-      unlink(temp_html)
-    } else {
-      render(source_file, pdf_document(), output_file = output_file)
-    }
+    # Use standard LaTeX PDF rendering to honor preamble.tex
+    render(source_file, pdf_document(
+      toc = TRUE,
+      toc_depth = 3,
+      includes = includes(in_header = "preamble.tex")
+    ), output_file = output_file)
   }
 } else {
   stop("ERROR: wrong number of arguments (expected 1 or 2)", call. = TRUE)
