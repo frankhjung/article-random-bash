@@ -1,6 +1,6 @@
 ---
 title: 'Thoughts on RNG - Using Bash Scripts'
-author: "[Frank Jung](https://www.linkedin.com/in/frankjung/)"
+author: '[Frank Jung](https://www.linkedin.com/in/frankjung/)'
 date: '`r format(Sys.time(), format="%d %b %Y")`'
 output:
   html_document:

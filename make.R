@@ -28,7 +28,7 @@ if (length(args) == 1) {
   if (endsWith(output_file, "html")) {
     render(source_file, html_document(css = "article.css", toc = TRUE, toc_depth = 3), output_file = output_file)
   } else if (endsWith(output_file, "pdf")) {
-    # Use standard LaTeX PDF rendering to honor preamble.tex
+    # Use standard LaTeX PDF rendering to honour preamble.tex
     render(source_file, pdf_document(
       toc = TRUE,
       toc_depth = 3,
